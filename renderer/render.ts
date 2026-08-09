@@ -43,6 +43,13 @@ const PNG_FONT_FAMILY = "Comic Neue";
 // star-history fetches at most this many pages of stargazers per repo.
 const MAX_REQUEST_AMOUNT = 16;
 
+// Bumped whenever the rendered output changes for reasons other than star data
+// (stripping a node, changing a default, upgrading the vendored renderer). It
+// feeds the signature below, so bumping it forces every consumer to re-render
+// and commit on the next run instead of waiting for a star change or a day
+// rollover. Version 2 dropped the "star-history.com" watermark.
+const RENDER_VERSION = 2;
+
 // JSDOM lowercases camelCase SVG names; restore the ones D3's filter emits.
 // Copied from star-history backend/utils.ts.
 function fixJsdomSvgCasing(svgContent: string): string {
@@ -161,8 +168,12 @@ async function main() {
     // within a day and only change on real star movement or a day rollover.
     // Include the requested font so changing only the font (no star movement,
     // same day) still invalidates the cache and forces a PNG re-render.
+    // Include RENDER_VERSION so a change to how the chart is drawn (not to the
+    // star data) still invalidates the cache. Without it, a rendering change
+    // would not reach repos whose stars have not moved until the day rolls over.
     const sigFont = (args["font-family"] || "").trim();
     const sigInput = JSON.stringify({
+      v: RENDER_VERSION,
       font: sigFont,
       repos: repoData.map((r: any) => ({
         repo: r.repo,
@@ -212,6 +223,17 @@ async function main() {
   // These are also the only Math.random()-driven elements, so removing them
   // keeps the output deterministic.
   svg.querySelectorAll(".browser-only").forEach((el) => el.remove());
+  // Drop the bottom-right "star-history.com" watermark (drawWatermark appends a
+  // <text> immediately followed by its base64 icon <image>). Attribution for the
+  // vendored renderer stays in vendor/LICENSE and NOTICE.md, which is what the
+  // MIT license actually requires. Done here instead of in vendor/ so the
+  // vendored tree stays a clean copy of the pinned upstream commit.
+  svg.querySelectorAll("text").forEach((el) => {
+    if (el.textContent?.trim() !== "star-history.com") return;
+    const icon = el.nextElementSibling;
+    if (icon?.tagName.toLowerCase() === "image") icon.remove();
+    el.remove();
+  });
 
   const svgContent = fixJsdomSvgCasing(svg.outerHTML);
   const optimized = optimize(svgContent, { multipass: true }).data;

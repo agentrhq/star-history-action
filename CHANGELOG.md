@@ -4,6 +4,20 @@ All notable changes to this action are documented here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project aims
 to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-08-09
+
+### Changed
+- The chart no longer draws the "star-history.com" watermark in the bottom-right
+  corner. The vendored renderer is untouched; the watermark text and its icon
+  are stripped after rendering, alongside the existing `<style>` and
+  `.browser-only` strips. Attribution for the vendored star-history code stays
+  where the MIT license needs it, in `renderer/vendor/LICENSE` and
+  `renderer/NOTICE.md`.
+- The change-detection signature now includes a `RENDER_VERSION` constant, so a
+  change to how the chart is drawn reaches every repo on the next run instead of
+  waiting for a star change or a day rollover. This release bumps it, so the
+  first run after upgrade re-renders and commits even with flat stars.
+
 ## [1.0.4] - 2026-07-18
 
 ### Fixed
@@ -104,6 +118,7 @@ to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Triggers for push, cron schedule, and manual dispatch, with a documented
   own-repos scope and PAT guidance for repos the default token cannot read.
 
+[1.0.5]: https://github.com/narayann7/star-history-action/releases/tag/v1.0.5
 [1.0.4]: https://github.com/narayann7/star-history-action/releases/tag/v1.0.4
 [1.0.3]: https://github.com/narayann7/star-history-action/releases/tag/v1.0.3
 [1.0.2]: https://github.com/narayann7/star-history-action/releases/tag/v1.0.2

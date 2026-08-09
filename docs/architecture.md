@@ -79,8 +79,9 @@ How star-history-action works, end to end.
    └──────────────┬──────────────┘        └──────────────────────────┘
                   ▼
    ┌─────────────────────────────┐
-   │ signature = sha256 of star  │   day-level dates + counts
-   │ data  ──► write --signature │   (used for change detection)
+   │ signature = sha256 of star  │   day-level dates + counts, plus the
+   │ data + font + RENDER_VERSION│   requested font and a render version
+   │       ──► write --signature │   (used for change detection)
    └──────────────┬──────────────┘
                   ▼
    ┌─────────────────────────────┐
@@ -95,9 +96,10 @@ How star-history-action works, end to end.
    └──────────────┬──────────────┘        └──────────────────────────┘
                   ▼
    ┌─────────────────────────────┐
-   │ strip <style>/@font-face    │   GitHub strips it anyway; also
-   │ and .browser-only nodes     │   removes the only non-MIT font
-   └──────────────┬──────────────┘
+   │ strip <style>/@font-face,   │   GitHub strips the style anyway; also
+   │ .browser-only nodes, and    │   removes the only non-MIT font. The
+   │ the star-history.com mark   │   watermark goes, attribution stays in
+   └──────────────┬──────────────┘   vendor/LICENSE + NOTICE.md
                   ▼
    ┌─────────────────────────────┐
    │ fix JSDOM casing + svgo      │
@@ -139,6 +141,11 @@ How star-history-action works, end to end.
 The SVG itself has sub-pixel float jitter between runs, so comparing rendered
 files would always look changed. Comparing the star data (dates + counts, day
 granularity) instead means a commit only happens when the chart really moves.
+
+The signature also covers the requested font and `RENDER_VERSION` in
+`render.ts`. Bump that constant whenever the drawing changes for a reason other
+than star data; otherwise a repo with flat stars keeps its old chart until the
+day rolls over.
 
 ## 5. Data provenance
 
