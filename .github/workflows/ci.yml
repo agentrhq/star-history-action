@@ -13,6 +13,10 @@ on:
 # times against the same commit: no permissions block (the repo's read-only
 # default) and an explicit "contents: read" both 403 on the first request, while
 # "contents: write" renders. Dropping this back to read turns CI red again.
+#
+# This does not reach pull requests from forks: GitHub hands those runs a
+# read-only token whatever this block asks for. The steps that call the API are
+# skipped there, see the fork-pull-request note below.
 permissions:
   contents: write
 
@@ -32,11 +36,23 @@ jobs:
       - name: Install renderer dependencies
         run: npm ci --prefix renderer --no-audit --no-fund
 
+      # A fork pull request gets a read-only token, and the stargazers API
+      # answers 403 to a read-only token, so every step that calls the API is
+      # skipped below rather than failing for a reason unrelated to the change
+      # under review. Say so in the log instead of letting the steps vanish
+      # silently: the run is green with less covered than usual. The full suite
+      # runs on push to main and on pull requests from branches in this repo.
+      - name: Note reduced coverage (fork pull request)
+        if: ${{ github.event.pull_request.head.repo.fork }}
+        run: |
+          echo "::notice title=Renderer tests skipped::A fork pull request gets a read-only GITHUB_TOKEN, which the stargazers API rejects with 403. The smoke test, integration test, and font feature tests were skipped. They run on push to main."
+
       # Render a chart for this repo to confirm the vendored renderer works end
       # to end. github.token can read its own repo's stargazers. A fresh repo may
       # have zero stars, which still produces a valid SVG, so we only assert the
       # file is non-empty and looks like SVG.
       - name: Smoke-test the renderer
+        if: ${{ !github.event.pull_request.head.repo.fork }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
@@ -56,6 +72,7 @@ jobs:
       # action.yml runs it: change detection, stable filenames, PNG, backward
       # compat regeneration, both embed formats, and commit-ability.
       - name: Integration test
+        if: ${{ !github.event.pull_request.head.repo.fork }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -79,6 +96,7 @@ jobs:
       # back to the bundled font without failing, empty input skips the fetch,
       # and the font is part of the change signature.
       - name: Font feature tests
+        if: ${{ !github.event.pull_request.head.repo.fork }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
