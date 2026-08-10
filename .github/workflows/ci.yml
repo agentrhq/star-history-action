@@ -6,6 +6,16 @@ on:
   pull_request:
   workflow_dispatch:
 
+# contents: write, even though nothing here writes to the repo. Without it the
+# smoke test cannot read this repo's own stargazers: the API answers 403, and
+# star-history's client reports every 403 as "rate limit exceeded", which sent
+# past debugging down the wrong path. Verified by dispatching this workflow four
+# times against the same commit: no permissions block (the repo's read-only
+# default) and an explicit "contents: read" both 403 on the first request, while
+# "contents: write" renders. Dropping this back to read turns CI red again.
+permissions:
+  contents: write
+
 jobs:
   validate:
     runs-on: ubuntu-latest
