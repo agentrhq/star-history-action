@@ -1,0 +1,10 @@
+{
+  "targets": [
+    {
+      "url": "https://github.com/agentrhq/webcmd",
+      "repo": "agentrhq/webcmd",
+      "startDate": "2026-07-01",
+      "note": "Sample target. History before first API observation is held at 0 from startDate."
+    }
+  ]
+}

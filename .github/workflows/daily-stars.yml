@@ -1,0 +1,52 @@
+name: Daily star update
+
+on:
+  schedule:
+    # Once a day at 06:15 UTC
+    - cron: "15 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-stars
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: npm install
+
+      - name: Update all targets
+        env:
+          # Default token works for repos this workflow's repo can read.
+          # For private or restricted stargazers, set secrets.GH_PAT.
+          GITHUB_TOKEN: ${{ secrets.GH_PAT || github.token }}
+          GH_TOKEN: ${{ secrets.GH_PAT || github.token }}
+        run: npm run update
+
+      - name: Commit state + charts
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Stable paths under charts/ are overwritten in place so the README
+          # embed URL never changes.
+          git add data/ charts/ targets.json
+          if git diff --cached --quiet; then
+            echo "No state changes."
+            exit 0
+          fi
+          git commit -m "chore: daily star charts [skip ci]"
+          branch="$(git rev-parse --abbrev-ref HEAD)"
+          git pull --rebase origin "$branch"
+          git push origin "HEAD:$branch"

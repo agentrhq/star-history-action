@@ -1,0 +1,18 @@
+{
+  "name": "star-smooth-tracker",
+  "private": true,
+  "type": "module",
+  "description": "Daily star-count tracker with exponential lockup smoothing. One state file per target repo.",
+  "scripts": {
+    "update": "tsx src/update.ts",
+    "bootstrap": "tsx src/bootstrap.ts",
+    "charts": "tsx src/render-charts.ts",
+    "test": "tsx src/smooth.test.ts && tsx src/state.test.ts && tsx src/chart.test.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}
