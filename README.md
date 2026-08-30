@@ -62,7 +62,7 @@ Workflow: [`.github/workflows/daily-stars.yml`](.github/workflows/daily-stars.ym
 
 | trigger | when |
 |---------|------|
-| `schedule` | `15 6 * * *` (06:15 UTC daily) |
+| `schedule` | `19 7 * * *` (07:19 UTC daily) |
 | `workflow_dispatch` | manual “Run workflow” button |
 
 Each run:

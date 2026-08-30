@@ -2,8 +2,8 @@ name: Daily star update
 
 on:
   schedule:
-    # Once a day at 06:15 UTC
-    - cron: "15 6 * * *"
+    # Once a day at 07:19 UTC (odd minute to dodge :00 load). Cron has no seconds.
+    - cron: "19 7 * * *"
   workflow_dispatch:
 
 permissions:
