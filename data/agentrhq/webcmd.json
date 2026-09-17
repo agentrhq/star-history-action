@@ -3,7 +3,7 @@
   "repo": "agentrhq/webcmd",
   "url": "https://github.com/agentrhq/webcmd",
   "startDate": "2026-07-01",
-  "updatedAt": "2026-09-16T12:38:41.963Z",
+  "updatedAt": "2026-09-17T12:37:36.431Z",
   "lockupDays": 5,
   "days": [
     {
@@ -374,27 +374,32 @@
     {
       "date": "2026-09-12",
       "raw": 2232,
-      "shown": 1871
+      "shown": 1841
     },
     {
       "date": "2026-09-13",
       "raw": 2246,
-      "shown": 1927
+      "shown": 1882
     },
     {
       "date": "2026-09-14",
       "raw": 2253,
-      "shown": 2004
+      "shown": 1937
     },
     {
       "date": "2026-09-15",
       "raw": 2252,
-      "shown": 2109
+      "shown": 2010
     },
     {
       "date": "2026-09-16",
       "raw": 2255,
-      "shown": 2255
+      "shown": 2113
+    },
+    {
+      "date": "2026-09-17",
+      "raw": 2257,
+      "shown": 2257
     }
   ]
 }
